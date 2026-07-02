@@ -58,7 +58,7 @@
   h1.hero-h em{font-style:italic;color:var(--sky)}
   .hero-sub{margin-top:24px;max-width:52ch;font-size:clamp(17px,2vw,20px);color:#eaf3f6}
   .hero-cta{margin-top:34px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-  .btn-lg{background:var(--orange);color:#fff;font-size:15px;letter-spacing:.6px;padding:17px 32px;box-shadow:0 8px 26px rgba(255,95,24,.34)}.btn-lg:hover{background:var(--orange-2)}
+  .btn-lg,.go,.dsel{background:var(--orange);color:#fff;font-size:15px;font-weight:700;letter-spacing:.6px;padding:16px 32px;border-radius:30px;box-shadow:0 8px 24px rgba(255,95,24,.32)}.btn-lg:hover,.go:hover,.dsel:hover{background:var(--orange-2);box-shadow:0 11px 30px rgba(255,95,24,.44)}
   .hero-cta .meta{font-size:14px;color:#cfe4ea}
   .hero-stats{margin-top:44px;display:flex;gap:34px;flex-wrap:wrap}
   .hero-stats .s b{font-family:var(--serif);font-size:30px;font-weight:500;color:#fff;display:block;line-height:1}.hero-stats .s span{font-size:13px;color:#bcd6de}
@@ -132,7 +132,7 @@
   .priority{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.priority .pl{font-size:11.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink-2);font-weight:700}
   .seg{display:inline-flex;background:var(--paper-2);border-radius:30px;padding:4px;gap:2px;flex-wrap:wrap}
   .seg button{border:none;background:transparent;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink-2);padding:9px 15px;border-radius:26px;cursor:pointer;transition:.2s}.seg button.on{background:var(--petrol);color:#fff}
-  .go{background:var(--orange);color:#fff;font-size:15px;padding:15px 32px;border-radius:30px}.go:hover{background:var(--orange-2)}
+  /* .go uses the shared orange CTA style (.btn-lg,.go,.dsel) */
   .err{color:#c0392b;font-size:14px;font-weight:600;display:none;padding:0 24px 18px}
 
   #results{display:none;margin-top:46px}
@@ -176,7 +176,7 @@
   .docs a{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--sky-ink);border-bottom:1px solid var(--line-lt);padding-bottom:2px}
   .docs a svg{width:14px;height:14px}
   .etf{margin-top:16px;font-size:12.5px;color:var(--ink-2);background:var(--paper);border-radius:10px;padding:11px 13px;line-height:1.5}.etf b{color:var(--petrol)}
-  .dsel{margin-top:16px;background:var(--orange);color:#fff;padding:13px 22px;border-radius:28px;font-size:14px}.dsel:hover{background:var(--orange-2)}
+  .dsel{margin-top:16px}
   .dbig{display:flex;align-items:baseline;gap:10px}.dbig .m{font-family:var(--serif);font-size:50px;color:var(--petrol);font-weight:500;letter-spacing:-1.5px;line-height:1}.dbig .u{font-size:13.5px;color:var(--ink-2)}
   .dsub{font-size:13.5px;color:var(--faint-dk);margin-top:6px}
   .calc{margin-top:16px;border-top:1px solid var(--line-lt);padding-top:14px}
@@ -213,8 +213,8 @@
   .addons h3{font-family:var(--serif);font-size:20px;color:var(--cream);margin-bottom:6px;font-weight:500}.addons p{color:var(--muted-dk);font-size:15px}
 
   .marq{overflow:hidden;padding:34px 0;border-top:1px solid var(--line-dk);border-bottom:1px solid var(--line-dk)}
-  .marq-track{display:flex;gap:56px;align-items:center;width:max-content;animation:scrollx 40s linear infinite}
-  .marq img{height:30px;filter:brightness(0) invert(1);opacity:.65}
+  .marq-track{display:flex;gap:56px;align-items:center;width:max-content;animation:scrollx 44s linear infinite}
+  .marq img{height:30px;filter:brightness(0) invert(1);opacity:.6}
   @keyframes scrollx{to{transform:translateX(-50%)}}
 
   .sources .method{font-size:14.5px;line-height:1.85;max-width:92ch;margin-bottom:24px;color:var(--ink-2)}.method sup{color:var(--sky-ink)}
@@ -233,7 +233,7 @@
 <body>
 
 <nav id="nav"><div class="wrap">
-  <div class="brand"><img class="cp" src="https://comparepower.com/wp-content/themes/comparepower_v2_X/images/compare-power-logo-light.png" alt="ComparePower" onerror="this.outerHTML='<b style=&quot;color:#fff;font-size:19px&quot;>Compare<span style=color:#37c6ef>Power</span></b>'"><span class="sep"></span><span class="co">Maple District Lofts<small>Resident move-in</small></span></div>
+  <div class="brand"><img class="cp" referrerpolicy="no-referrer" src="https://comparepower.com/wp-content/themes/comparepower_v2_X/images/compare-power-logo-light.png" alt="ComparePower" onerror="this.outerHTML='<b style=&quot;color:#fff;font-size:19px&quot;>Compare<span style=color:#37c6ef>Power</span></b>'"><span class="sep"></span><span class="co">Maple District Lofts<small>Resident move-in</small></span></div>
   <div class="navlinks"><a href="#how">How it works</a><a href="#tool">Find my plan</a><button class="btn navbtn" onclick="goTool()">Get started</button></div>
 </div></nav>
 
@@ -309,7 +309,7 @@
     <div class="res-top">
       <div class="readout"><div class="lab">Your best-fit plan · <span id="roU">950</span> kWh/mo</div>
         <div class="cost">$<span id="roCost">0</span><small>/mo</small></div>
-        <div class="win"><span class="lg"><img id="roLogo" alt=""></span> <b id="roWin">—</b> · <span id="roAvg">—</span>¢/kWh all-in</div></div>
+        <div class="win"><span class="lg"><img id="roLogo" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.style.display='none'"></span> <b id="roWin">—</b> · <span id="roAvg">—</span>¢/kWh all-in</div></div>
       <div class="viz-note">Every line is a plan, priced at your usage including <span class="du" id="duNote">CenterPoint Energy</span> delivery. Hover to preview, click a line or row to inspect it below. Drag the slider to watch the winner change with usage.</div>
     </div>
 
@@ -351,7 +351,7 @@
 </div></section>
 
 <footer><div class="wrap">
-  <div><img class="cp" src="https://comparepower.com/wp-content/themes/comparepower_v2_X/images/compare-power-logo-light.png" alt="ComparePower" onerror="this.style.display='none'"><div class="faddr">1920 McKinney Ave, 7th Floor, Dallas, TX 75201 · (469) 298-8045<br>TX Broker Registration BR190020 · The Power is Yours™</div></div>
+  <div><img class="cp" referrerpolicy="no-referrer" src="https://comparepower.com/wp-content/themes/comparepower_v2_X/images/compare-power-logo-light.png" alt="ComparePower" onerror="this.style.display='none'"><div class="faddr">1920 McKinney Ave, 7th Floor, Dallas, TX 75201 · (469) 298-8045<br>TX Broker Registration BR190020 · The Power is Yours™</div></div>
   <div class="fright">Unofficial concept &amp; prototype by Earl Lacey.<br>Not affiliated with ComparePower · illustrative demo, not a live ordering page.</div>
 </div></footer>
 
@@ -545,7 +545,8 @@ function updateDisplay(){
   document.querySelectorAll('#chart .dot').forEach(d=>{const i=+d.dataset.i;d.setAttribute('cx',x);d.setAttribute('cy',yOf(cost(PLANS[i],usage)));d.setAttribute('r',i===wi?6.5:4.5);});
   const sl=$('slider');sl.value=usage;sl.style.setProperty('--pct',((usage-500)/1500*100)+'%');
   $('roU').textContent=usage.toLocaleString();tickN($('roCost'),Math.round(cost(b,usage)));
-  $('roWin').textContent=b.prov;$('roAvg').textContent=allin(b,usage).toFixed(1);$('roLogo').src=b.logo;$('roLogo').alt=b.prov;
+  $('roWin').textContent=b.prov;$('roAvg').textContent=allin(b,usage).toFixed(1);
+  const rl=$('roLogo');if(rl){rl.parentNode.style.display='';rl.src=b.logo;rl.alt=b.prov;}
   emphasize(selected);renderDetail();
 }
 
@@ -562,7 +563,7 @@ function renderDetail(){
   const energy=p.rate*k,cr=p.credit(k),tdud=TDU.per*k,provSub=p.base+energy-cr,tduSub=TDU.base+tdud,total=provSub+tduSub;
   $('detail').innerHTML=`
     <div class="dcol">
-      <div class="dh"><span class="dlogo"><img src="${p.logo}" alt="${p.prov}" onerror="this.parentNode.innerHTML='<b style=&quot;color:#0a3242;font-size:14px&quot;>${p.prov}</b>'"></span>
+      <div class="dh"><span class="dlogo"><img src="${p.logo}" alt="${p.prov}" referrerpolicy="no-referrer" onerror="this.parentNode.innerHTML='<b style=&quot;color:#0a3242;font-size:14px&quot;>${p.prov}</b>'"></span>
         <span class="dp">${p.prov}<small>${p.plan} · ${p.term===1?'month-to-month':p.term+'-month'} · fixed rate</small></span></div>
       <div class="dtags">${selected===winnerIdx(k)?'<span class="tag best">Best for you</span>':''}${p.greenPct>=100?'<span class="tag green">100% green</span>':''}${p.nodep?'<span class="tag nd">No deposit</span>':''}${p.credit(k)>0?`<span class="tag fit">$${p.credit(k)} credit</span>`:'<span class="tag fit">Fixed rate</span>'}</div>
       <div class="docs"><a href="#" onclick="return docAlert('Electricity Facts Label')">${docIcon()} Facts Label</a><a href="#" onclick="return docAlert('Terms of Service')">${docIcon()} Terms of Service</a><a href="#" onclick="return docAlert('YRAC')">${docIcon()} YRAC</a></div>
@@ -599,7 +600,7 @@ function renderRows(){
   $('rows').innerHTML=list.length?list.map((p,i)=>{const a=allin(p,k).toFixed(1);
     return `<div class="row ${i===0?'best':''} ${p._i===selected?'sel':''}" data-i="${p._i}" onclick="pick(${p._i})">
       <div class="rank">${String(i+1).padStart(2,'0')}</div>
-      <div class="logo"><img src="${p.logo}" alt="${p.prov}" onerror="this.parentNode.innerHTML='<b style=&quot;color:#0a3242;font-size:13px&quot;>${p.prov}</b>'"></div>
+      <div class="logo"><img src="${p.logo}" alt="${p.prov}" referrerpolicy="no-referrer" onerror="this.parentNode.innerHTML='<b style=&quot;color:#0a3242;font-size:13px&quot;>${p.prov}</b>'"></div>
       <div class="info"><div class="pn">${p.prov}</div><div class="meta">${p.plan} · ${p.term===1?'month-to-month':p.term+'-month'}${p.credit(k)>0?` · $${p.credit(k)} usage credit`:''}</div>
         <div class="tags">${i===0?`<span class="tag best">${priority==='price'?'Best value':'Best for “'+segLabel()+'”'}</span>`:''}<span class="tag fit">${a}¢/kWh</span>${p.greenPct>=100?'<span class="tag green">Green</span>':''}${p.nodep?'<span class="tag nd">No deposit</span>':''}</div></div>
       <div class="price"><div class="m">$<span class="cu" data-to="${Math.round(p.c)}">0</span><small>/mo</small></div><div class="a">at ${k.toLocaleString()} kWh</div>
@@ -610,7 +611,7 @@ function renderRows(){
 function markRows(){document.querySelectorAll('#rows .row').forEach(r=>r.classList.toggle('sel',+r.dataset.i===selected));}
 function segLabel(){return {price:'lowest price',green:'100% green',nodep:'no deposit',simple:'simplest'}[priority];}
 
-(function(){const ids=[78,41,77,9998,81,22,63,72,14,74,10,80,1,53];const set=ids.map(id=>`<img src="${LOGO(id)}" alt="" onerror="this.style.display='none'">`).join('');$('marq').innerHTML=set+set;})();
+(function(){const ids=[78,41,77,9998,81,22,63,72,14,74,10,80,1,53];const set=ids.map(id=>`<img src="${LOGO(id)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">`).join('');$('marq').innerHTML=set+set;})();
 
 const steps=[...document.querySelectorAll('#steps [data-step]')];
 function storyScroll(){const t=document.querySelector('.story-track');if(!t)return;const r=t.getBoundingClientRect(),vh=innerHeight,prog=Math.max(0,Math.min(1,(vh*.6-r.top)/r.height));$('storyFill').style.height=(prog*100)+'%';steps.forEach(s=>s.classList.toggle('on',s.getBoundingClientRect().top<vh*.7));}
