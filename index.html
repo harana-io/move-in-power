@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Move-In Power · ComparePower</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!--
+  MOVE-IN POWER — cinematic, accessible, interactive co-branded move-in electricity experience for multifamily renters.
+  Prototype by Earl Lacey for the ComparePower Director of Demand Generation role.
+  Unofficial concept — not affiliated with or endorsed by ComparePower. Illustrative data (EFL logic, July 2026).
+  Utility (TDU) detection, usage drivers, and plan filters informed by EIA/DOE and TX retail-market practice.
+-->
+<style>
+  :root{
+    --petrol:#0a3242;--petrol-2:#0d3d4f;--night:#072530;
+    --cream:#f6f2ea;--ink:#123039;--ink-2:#3f5a63;--muted-dk:#a9c2cb;--faint-dk:#7f9aa4;
+    --sky:#37c6ef;--sky-2:#12a8dc;--sky-ink:#0a6f95;--green:#1a9e5f;--green-dk:#137a49;
+    --orange:#ff5f18;--orange-2:#e64f00;
+    --paper:#f4f8f9;--paper-2:#eaf1f3;--line-lt:#dbe6e9;--line-dk:rgba(233,240,242,.14);
+    --serif:'Fraunces',Georgia,serif;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--ease:cubic-bezier(.2,.75,.3,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--night);color:var(--cream);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--sky);color:#04202b}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
+  .serif{font-family:var(--serif)} img{max-width:100%}
+  :focus-visible{outline:3px solid var(--sky);outline-offset:3px}
+  .btn{font-family:var(--sans);cursor:pointer;font-weight:700;border:none;transition:.28s var(--ease)}
+  .js .rv{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+  .js .rv.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.js .rv{opacity:1!important;transform:none!important;transition:none}*{animation:none!important}html{scroll-behavior:auto}}
+  .kicker{font-size:12.5px;letter-spacing:2.6px;text-transform:uppercase;color:var(--sky);font-weight:700}
+
+  nav{position:fixed;inset:0 0 auto 0;z-index:100;transition:background .4s,box-shadow .4s}
+  nav.solid{background:rgba(7,37,48,.92);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line-dk)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:16px clamp(20px,4vw,48px)}
+  .brand{display:flex;align-items:center;gap:14px}.brand .cp{height:26px}
+  .brand .sep{width:1px;height:22px;background:var(--line-dk)}
+  .brand .co{font-size:13.5px;color:var(--cream);font-weight:600;line-height:1.2}
+  .brand .co small{display:block;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted-dk);font-weight:600}
+  .navlinks{display:flex;align-items:center;gap:30px}.navlinks a{font-size:14px;color:var(--cream);font-weight:500;opacity:.9}.navlinks a:hover{opacity:1;color:var(--sky)}
+  .navbtn{border:1.5px solid rgba(255,255,255,.25);color:var(--cream);background:transparent;font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;padding:11px 20px}
+  .navbtn:hover{background:var(--sky);border-color:var(--sky);color:#04202b}
+  @media(max-width:760px){.navlinks a{display:none}}
+
+  .hero{position:relative;min-height:92vh;display:flex;align-items:center;overflow:hidden;padding:110px 0 70px}
+  .hero-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:64% center;transform:scale(1.08);animation:kb 20s ease-out forwards}
+  @keyframes kb{to{transform:scale(1)}}
+  .hero-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(6,31,40,.95) 0%,rgba(6,31,40,.82) 40%,rgba(6,31,40,.35) 72%,rgba(6,31,40,.55) 100%),linear-gradient(0deg,var(--night) 1%,rgba(6,31,40,0) 40%)}
+  canvas#spark{position:absolute;inset:0;z-index:2;pointer-events:none}
+  .hero .wrap{position:relative;z-index:3;width:100%}.hero .kicker{margin-bottom:22px}
+  h1.hero-h{font-family:var(--serif);font-weight:500;font-size:clamp(40px,7vw,86px);line-height:1.02;letter-spacing:-1px;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.35)}
+  h1.hero-h em{font-style:italic;color:var(--sky)}
+  .hero-sub{margin-top:24px;max-width:52ch;font-size:clamp(17px,2vw,20px);color:#eaf3f6}
+  .hero-cta{margin-top:34px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .btn-lg{background:var(--orange);color:#fff;font-size:15px;letter-spacing:.6px;padding:17px 32px;box-shadow:0 8px 26px rgba(255,95,24,.34)}.btn-lg:hover{background:var(--orange-2)}
+  .hero-cta .meta{font-size:14px;color:#cfe4ea}
+  .hero-stats{margin-top:44px;display:flex;gap:34px;flex-wrap:wrap}
+  .hero-stats .s b{font-family:var(--serif);font-size:30px;font-weight:500;color:#fff;display:block;line-height:1}.hero-stats .s span{font-size:13px;color:#bcd6de}
+  .scrolldown{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px;color:#bcd6de}
+  .scrolldown .l{width:1px;height:40px;background:linear-gradient(var(--sky),transparent);animation:drip 2.2s infinite}
+  @keyframes drip{0%{opacity:0;transform:scaleY(0);transform-origin:top}45%{opacity:1}100%{opacity:0;transform:scaleY(1);transform-origin:bottom}}
+  .scrolldown span{font-size:10px;letter-spacing:2px;text-transform:uppercase}
+
+  .trust{background:var(--paper);color:var(--ink)}
+  .trust .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:34px clamp(20px,4vw,48px)}
+  .trust .t{display:flex;flex-direction:column;gap:3px;border-left:2px solid var(--sky);padding-left:16px}
+  .trust .t b{font-family:var(--serif);font-size:26px;font-weight:500;color:var(--petrol)}.trust .t span{font-size:13.5px;color:var(--ink-2);font-weight:500}
+  @media(max-width:760px){.trust .wrap{grid-template-columns:1fr 1fr;gap:22px}}
+
+  section{position:relative;padding:clamp(70px,9vw,120px) 0}
+  .sec-paper{background:var(--paper);color:var(--ink)}.sec-petrol{background:linear-gradient(180deg,var(--petrol),var(--petrol-2));color:var(--cream)}.sec-dark{background:var(--night)}
+  .eyebrow-row{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+  .eyebrow-row .num{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--sky)}.eyebrow-row .rule{flex:1;height:1px;max-width:70px;background:currentColor;opacity:.18}
+  h2.big{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.6vw,52px);line-height:1.06;letter-spacing:-.6px;max-width:18ch}
+  h2.big em{font-style:italic;color:var(--sky-ink)}.sec-dark h2.big em,.sec-petrol h2.big em{color:var(--sky)}
+  .lead{margin-top:20px;max-width:56ch;font-size:18px;line-height:1.7}.sec-paper .lead{color:var(--ink-2)}.sec-petrol .lead{color:var(--muted-dk)}
+
+  .story-track{position:absolute;left:calc(clamp(20px,4vw,48px) + 26px);top:0;bottom:0;width:2px;background:var(--line-lt)}
+  .story-fill{position:absolute;left:0;top:0;width:100%;height:0;background:linear-gradient(var(--sky),var(--sky-2));box-shadow:0 0 14px rgba(55,198,239,.5)}
+  .steps{display:flex;flex-direction:column;gap:clamp(34px,6vw,70px);position:relative}
+  .step{display:grid;grid-template-columns:54px 1fr;gap:26px;align-items:start}
+  .step .dot{width:54px;height:54px;border-radius:50%;background:var(--paper);border:2px solid var(--line-lt);display:flex;align-items:center;justify-content:center;color:var(--sky-ink);transition:.5s var(--ease);position:relative;z-index:2}
+  .step.on .dot{border-color:var(--sky);background:var(--sky);color:#fff;box-shadow:0 0 0 6px rgba(55,198,239,.16)}.step .dot svg{width:24px;height:24px}
+  .step h3{font-family:var(--serif);font-size:clamp(22px,2.6vw,30px);font-weight:500;color:var(--petrol);letter-spacing:-.3px}.step h3 em{font-style:italic;color:var(--sky-ink)}
+  .step .n{font-size:12.5px;letter-spacing:2px;text-transform:uppercase;color:var(--sky-ink);font-weight:700;margin-bottom:5px}
+  .step p{margin-top:8px;font-size:16.5px;color:var(--ink-2);max-width:52ch}
+
+  /* configure */
+  .configure{margin-top:40px;background:#fff;border:1px solid var(--line-lt);border-radius:20px;box-shadow:0 24px 60px -28px rgba(8,50,66,.45);overflow:hidden;color:var(--ink)}
+  .cfg-grid{display:grid;grid-template-columns:repeat(5,1fr)}
+  @media(max-width:820px){.cfg-grid{grid-template-columns:1fr 1fr}}
+  .cfg{padding:22px 24px;border-right:1px solid var(--line-lt);border-bottom:1px solid var(--line-lt)}.cfg:last-child{border-right:none}
+  .cfg label,.cell label{display:block;font-size:11.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink-2);font-weight:700;margin-bottom:10px}
+  .cfg input,.cfg select{width:100%;border:none;background:transparent;font-family:var(--sans);font-size:18px;font-weight:600;color:var(--petrol);outline:none}
+  .cfg select{appearance:none;cursor:pointer}
+  .util-bar{display:none;align-items:center;gap:12px;padding:14px 24px;background:#eaf9f1;border-bottom:1px solid #cdeede;color:var(--green-dk);font-weight:600;font-size:14px}
+  .util-bar.show{display:flex}
+  .util-bar .chk{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .util-bar b{color:var(--petrol)} .util-bar span.sub{color:var(--ink-2);font-weight:500}
+  .row2{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--line-lt)}
+  @media(max-width:820px){.row2{grid-template-columns:1fr}}
+  .cell{padding:22px 24px;border-right:1px solid var(--line-lt);position:relative}.cell:last-child{border-right:none}
+  .msel-btn{display:flex;align-items:center;gap:10px;width:100%;border:1.5px solid var(--line-lt);background:var(--paper);border-radius:12px;padding:12px 15px;font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--petrol);cursor:pointer;justify-content:space-between}
+  .msel-btn .r{display:flex;align-items:center;gap:9px}
+  .msel-btn .cnt{background:var(--sky);color:#04202b;font-size:12px;font-weight:800;border-radius:20px;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+  .msel-btn svg{width:14px;height:14px;transition:.2s}.msel.open .msel-btn svg{transform:rotate(180deg)}
+  .msel-menu{position:absolute;top:calc(100% + 6px);left:24px;right:24px;z-index:30;background:#fff;border:1px solid var(--line-lt);border-radius:14px;box-shadow:0 20px 44px -16px rgba(8,50,66,.4);padding:8px;max-height:300px;overflow:auto;display:none}
+  .msel.open .msel-menu{display:block}
+  .opt{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:14px;color:var(--ink);font-weight:500}
+  .opt:hover{background:var(--paper-2)}.opt .est{margin-left:auto;font-size:12px;color:var(--faint-dk);font-weight:600}.opt input{width:17px;height:17px;accent-color:var(--sky)}
+  .pchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .pchip{display:inline-flex;align-items:center;gap:7px;background:#eefaff;border:1px solid #bfeafb;color:var(--sky-ink);font-size:12.5px;font-weight:600;padding:5px 6px 5px 11px;border-radius:20px}
+  .pchip i{cursor:pointer;font-style:normal;width:16px;height:16px;border-radius:50%;background:#d3edf8;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+  .knowrow{display:flex;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid var(--line-lt);flex-wrap:wrap}
+  .knowrow .lbl{font-size:11.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink-2);font-weight:700}
+  .tchip{display:inline-flex;align-items:center;gap:9px;border:1.5px solid var(--line-lt);border-radius:26px;padding:11px 15px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink-2);user-select:none}
+  .tchip .bx{width:16px;height:16px;border:1.6px solid var(--muted-dk);border-radius:5px;position:relative;flex-shrink:0}
+  .tchip input{display:none}.tchip.on{border-color:var(--sky);color:var(--petrol);background:#eefaff}
+  .tchip.on .bx{background:var(--sky);border-color:var(--sky)}.tchip.on .bx:after{content:"";position:absolute;left:4px;top:1px;width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .usebox{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--ink-2);font-weight:600}
+  .usebox input[type=number]{width:104px;border:1.5px solid var(--line-lt);border-radius:10px;padding:10px 12px;font-size:15px;font-weight:700;color:var(--petrol);font-family:var(--sans)}.usebox input:disabled{opacity:.35}
+  .cfg-bottom{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 24px;flex-wrap:wrap}
+  .estline{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .estline .lbl{font-size:11.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink-2);font-weight:700}
+  .estline b{font-family:var(--serif);font-size:28px;color:var(--petrol);font-weight:500;line-height:1}.estline .bd{font-size:12.5px;color:var(--faint-dk);width:100%}
+  .priority{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.priority .pl{font-size:11.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink-2);font-weight:700}
+  .seg{display:inline-flex;background:var(--paper-2);border-radius:30px;padding:4px;gap:2px;flex-wrap:wrap}
+  .seg button{border:none;background:transparent;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink-2);padding:9px 15px;border-radius:26px;cursor:pointer;transition:.2s}.seg button.on{background:var(--petrol);color:#fff}
+  .go{background:var(--orange);color:#fff;font-size:15px;padding:15px 32px;border-radius:30px}.go:hover{background:var(--orange-2)}
+  .err{color:#c0392b;font-size:14px;font-weight:600;display:none;padding:0 24px 18px}
+
+  #results{display:none;margin-top:46px}
+  .res-top{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;margin-bottom:26px}
+  @media(max-width:900px){.res-top{grid-template-columns:1fr}}
+  .readout .lab{font-size:12.5px;letter-spacing:2px;text-transform:uppercase;color:var(--sky);font-weight:700;margin-bottom:10px}
+  .readout .cost{font-family:var(--serif);font-weight:500;font-size:clamp(52px,8vw,90px);line-height:.9;color:#fff;letter-spacing:-2px}
+  .readout .cost small{font-size:.26em;color:var(--muted-dk);font-family:var(--sans);font-weight:600;letter-spacing:0}
+  .readout .win{margin-top:16px;font-size:17px;color:var(--muted-dk);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .readout .win .lg{height:30px;background:#fff;border:1px solid var(--line-lt);border-radius:8px;padding:4px 8px;display:inline-flex;align-items:center}.readout .win .lg img{height:20px}
+  .readout .win b{font-family:var(--serif);font-style:italic;font-weight:500;color:#fff;font-size:20px}
+  .viz-note{font-size:14.5px;color:var(--muted-dk);max-width:44ch}
+  .viz-note .du{color:var(--sky);font-weight:600}
+
+  .chart-card{background:linear-gradient(180deg,#fff,#f6fbfc);border:1px solid var(--line-lt);border-radius:18px;padding:24px 26px 20px;box-shadow:0 20px 50px -28px rgba(8,50,66,.45)}
+  .chart-card .ct{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .chart-card .ct h3{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--petrol)}.chart-card .ct span{font-size:12.5px;color:var(--ink-2)}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .legend .lc{display:flex;align-items:center;gap:8px;border:1px solid var(--line-lt);border-radius:24px;padding:6px 14px 6px 10px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-2);background:#fff;transition:.18s}
+  .legend .lc .sw{width:12px;height:12px;border-radius:3px;flex-shrink:0}.legend .lc:hover{border-color:var(--sky)}.legend .lc.on{border-color:var(--petrol);color:var(--petrol);box-shadow:0 3px 10px rgba(8,50,66,.16)}
+  .chart-shell{position:relative} svg.chart{width:100%;height:auto;display:block;overflow:visible}
+  #chart .pl{transition:stroke-width .25s var(--ease),opacity .25s var(--ease)}
+  .tt{position:absolute;pointer-events:none;background:var(--petrol);color:#fff;font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:9px;transform:translate(-50%,-135%);white-space:nowrap;opacity:0;transition:opacity .14s;z-index:6;box-shadow:0 8px 22px rgba(8,50,66,.35)}
+  .tt .s{color:var(--sky);font-weight:700}.tt:after{content:"";position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--petrol);border-bottom:none}
+  .slider-row{display:flex;align-items:center;gap:16px;margin-top:16px}.slider-row .cap{font-size:12px;color:var(--ink-2);white-space:nowrap;font-weight:600}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--sky) 0%,var(--sky) var(--pct,30%),var(--paper-2) var(--pct,30%));outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--sky);box-shadow:0 3px 10px rgba(8,50,66,.3);cursor:grab;margin-top:-1px}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--sky);cursor:grab}
+
+  .detail{margin-top:20px;background:#fff;border:1px solid var(--line-lt);border-radius:18px;box-shadow:0 20px 50px -28px rgba(8,50,66,.45);display:grid;grid-template-columns:1.05fr 1fr 1.15fr;overflow:hidden}
+  @media(max-width:960px){.detail{grid-template-columns:1fr}}
+  .dcol{padding:24px 26px;border-right:1px solid var(--line-lt)}.dcol:last-child{border-right:none}
+  @media(max-width:960px){.dcol{border-right:none;border-bottom:1px solid var(--line-lt)}}
+  .dh{display:flex;align-items:center;gap:13px}
+  .dlogo{height:44px;min-width:70px;background:var(--paper);border:1px solid var(--line-lt);border-radius:10px;padding:6px 10px;display:flex;align-items:center;justify-content:center}.dlogo img{max-height:28px;max-width:120px}
+  .dp{font-family:var(--serif);font-size:23px;color:var(--petrol);font-weight:500;line-height:1.05}.dp small{display:block;font-family:var(--sans);font-size:12.5px;color:var(--ink-2);font-weight:500;margin-top:3px}
+  .dtags{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .tag{font-size:11.5px;font-weight:700;letter-spacing:.4px;padding:4px 10px;border-radius:6px}
+  .tag.best{background:var(--orange);color:#fff}.tag.green{background:#e5f7ee;color:var(--green-dk)}.tag.nd{background:#e7f4fb;color:var(--sky-ink)}.tag.fit{background:#eef0f2;color:var(--ink-2)}
+  .docs{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px}
+  .docs a{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--sky-ink);border-bottom:1px solid var(--line-lt);padding-bottom:2px}
+  .docs a svg{width:14px;height:14px}
+  .etf{margin-top:16px;font-size:12.5px;color:var(--ink-2);background:var(--paper);border-radius:10px;padding:11px 13px;line-height:1.5}.etf b{color:var(--petrol)}
+  .dsel{margin-top:16px;background:var(--orange);color:#fff;padding:13px 22px;border-radius:28px;font-size:14px}.dsel:hover{background:var(--orange-2)}
+  .dbig{display:flex;align-items:baseline;gap:10px}.dbig .m{font-family:var(--serif);font-size:50px;color:var(--petrol);font-weight:500;letter-spacing:-1.5px;line-height:1}.dbig .u{font-size:13.5px;color:var(--ink-2)}
+  .dsub{font-size:13.5px;color:var(--faint-dk);margin-top:6px}
+  .calc{margin-top:16px;border-top:1px solid var(--line-lt);padding-top:14px}
+  .calc .ch{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--sky-ink);font-weight:700;margin-bottom:10px}
+  .calc table{width:100%;border-collapse:collapse;font-size:13px}
+  .calc td{padding:5px 0;color:var(--ink-2)}.calc td:last-child{text-align:right;font-weight:600;color:var(--ink)}
+  .calc tr.sub td{border-top:1px solid var(--line-lt);padding-top:8px;font-weight:600;color:var(--petrol)}
+  .calc tr.tot td{border-top:2px solid var(--petrol);padding-top:9px;font-size:15px;font-weight:800;color:var(--petrol)}
+  .calc tr.cr td{color:var(--green-dk)}
+  .efl .et{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--sky-ink);font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between}.efl .et span{color:var(--faint-dk);letter-spacing:.3px;text-transform:none;font-weight:500}
+  .efl .bars{display:flex;gap:16px;align-items:flex-end}.efl .b{flex:1;text-align:center}
+  .efl .b .bar{height:88px;display:flex;align-items:flex-end;background:var(--paper-2);border-radius:8px;overflow:hidden}.efl .b .bar i{display:block;width:100%;background:linear-gradient(180deg,var(--sky),var(--sky-2));border-radius:8px 8px 0 0;transition:height .6s var(--ease)}
+  .efl .b .v{font-size:17px;font-weight:800;color:var(--petrol);margin-top:9px}.efl .b .v small{font-size:10px;color:var(--ink-2);font-weight:600}.efl .b .k{font-size:11px;color:var(--faint-dk)}
+  .efl .foot{font-size:11.5px;color:var(--green-dk);margin-top:14px;display:flex;gap:7px;align-items:flex-start}.efl .foot svg{width:15px;height:15px;flex-shrink:0;margin-top:1px}
+
+  .rows-h{font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted-dk);font-weight:700;margin:44px 0 14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .rows-h .cnt{color:var(--sky)}
+  .rows{display:flex;flex-direction:column;gap:12px}
+  .row{display:grid;grid-template-columns:40px 150px 1fr auto;gap:22px;align-items:center;background:#fff;border:1px solid var(--line-lt);border-radius:14px;padding:16px 22px;transition:.25s var(--ease);cursor:pointer;color:var(--ink)}
+  .row:hover{box-shadow:0 14px 34px -20px rgba(8,50,66,.45);transform:translateY(-2px)}
+  .row.best{border-color:var(--orange);box-shadow:0 0 0 1px var(--orange)}.row.sel{outline:2px solid var(--sky);outline-offset:-1px}
+  .row .rank{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--faint-dk)}.row.best .rank{color:var(--orange)}
+  .row .logo{height:42px;background:var(--paper);border:1px solid var(--line-lt);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px 8px}.row .logo img{max-height:26px;max-width:130px}
+  .row .info .pn{font-family:var(--serif);font-size:20px;font-weight:500;color:var(--petrol)}.row .info .meta{font-size:13.5px;color:var(--ink-2);margin-top:3px}
+  .row .info .tags{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+  .row .price{text-align:right}
+  .row .price .m{font-family:var(--serif);font-weight:500;font-size:34px;color:var(--petrol);letter-spacing:-1px;line-height:1}.row .price .m small{font-size:.4em;color:var(--ink-2);font-family:var(--sans);font-weight:600}
+  .row .price .a{font-size:12.5px;color:var(--faint-dk);margin:5px 0 9px}
+  .row .price .sel{background:var(--petrol);color:#fff;font-size:12.5px;letter-spacing:.6px;padding:10px 18px;border-radius:26px}.row .price .sel:hover{background:var(--sky);color:#04202b}
+  @media(max-width:820px){.row{grid-template-columns:30px 1fr auto;gap:14px}.row .logo,.row .info .meta{display:none}}
+
+  .addons{margin-top:46px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px}
+  @media(max-width:760px){.addons{grid-template-columns:1fr}}
+  .addons h3{font-family:var(--serif);font-size:20px;color:var(--cream);margin-bottom:6px;font-weight:500}.addons p{color:var(--muted-dk);font-size:15px}
+
+  .marq{overflow:hidden;padding:34px 0;border-top:1px solid var(--line-dk);border-bottom:1px solid var(--line-dk)}
+  .marq-track{display:flex;gap:56px;align-items:center;width:max-content;animation:scrollx 40s linear infinite}
+  .marq img{height:30px;filter:brightness(0) invert(1);opacity:.65}
+  @keyframes scrollx{to{transform:translateX(-50%)}}
+
+  .sources .method{font-size:14.5px;line-height:1.85;max-width:92ch;margin-bottom:24px;color:var(--ink-2)}.method sup{color:var(--sky-ink)}
+  .refgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 44px;margin-bottom:26px}
+  .refl{display:flex;gap:12px;font-size:13px;line-height:1.6;color:var(--ink-2)}.refl .n{font-family:var(--serif);font-style:italic;color:var(--sky-ink)}.refl b{color:var(--ink)}.refl a{color:var(--sky-ink);border-bottom:1px solid var(--line-lt)}
+  .disc{font-size:12.5px;line-height:1.75;max-width:96ch;margin-top:10px;color:var(--ink-2)}.disc b{color:var(--ink)}
+  .disc.illus{border-left:3px solid var(--orange);padding:10px 0 10px 16px;color:#9a5324}.disc.illus b{color:var(--orange-2)}
+  @media(max-width:760px){.refgrid{grid-template-columns:1fr}}
+
+  footer{background:var(--night);color:var(--muted-dk);padding:46px 0 66px}
+  footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-end}
+  footer .cp{height:22px;opacity:.85;margin-bottom:12px}footer .faddr{font-size:12.5px;line-height:1.8;color:var(--faint-dk)}
+  footer .fright{font-size:12px;color:var(--faint-dk);text-align:right;line-height:1.7}
+</style>
+</head>
+<body>
+
+<nav id="nav"><div class="wrap">
+  <div class="brand"><img class="cp" src="https://comparepower.com/wp-content/themes/comparepower_v2_X/images/compare-power-logo-light.png" alt="ComparePower" onerror="this.outerHTML='<b style=&quot;color:#fff;font-size:19px&quot;>Compare<span style=color:#37c6ef>Power</span></b>'"><span class="sep"></span><span class="co">Maple District Lofts<small>Resident move-in</small></span></div>
+  <div class="navlinks"><a href="#how">How it works</a><a href="#tool">Find my plan</a><button class="btn navbtn" onclick="goTool()">Get started</button></div>
+</div></nav>
+
+<header class="hero">
+  <div class="hero-img" id="heroImg"></div><div class="hero-scrim"></div><canvas id="spark"></canvas>
+  <div class="wrap">
+    <div class="kicker">Move-in electricity for Maple District Lofts residents</div>
+    <h1 class="hero-h">Get the lights on,<br><em>the right way.</em></h1>
+    <p class="hero-sub">You picked the apartment — now pick the electricity. We'll find the genuinely cheapest plan for a home your size at true all-in pricing, handle same-day connection, and get your lights on by move-in day. No-deposit options, short leases welcome.</p>
+    <div class="hero-cta"><button class="btn btn-lg" onclick="goTool()">Find my plan</button><span class="meta">≈ 10 minutes · free · your info isn't sold</span></div>
+    <div class="hero-stats"><div class="s"><b>68,000+</b><span>verified Texan reviews</span></div><div class="s"><b>100+</b><span>plans compared</span></div><div class="s"><b>$0</b><span>markups, ever</span></div></div>
+  </div>
+  <div class="scrolldown"><div class="l"></div><span>Scroll</span></div>
+</header>
+
+<div class="trust"><div class="wrap">
+  <div class="t"><b>Renter-ready</b><span>no-deposit &amp; short-term plans</span></div>
+  <div class="t"><b>All-in</b><span>pricing at your real usage</span></div>
+  <div class="t"><b>Same-day</b><span>lights on by move-in</span></div>
+  <div class="t"><b>Free</b><span>providers pay us, not you</span></div>
+</div></div>
+
+<section id="how" class="sec-paper"><div class="wrap" style="position:relative">
+  <div class="eyebrow-row rv"><span class="num">01</span><span class="kicker" style="color:var(--sky-ink)">From keys to lights-on</span><span class="rule"></span></div>
+  <h2 class="big rv">Three steps. <em>About ten minutes.</em></h2>
+  <div class="steps" id="steps" style="margin-top:52px">
+    <div class="story-track"><div class="story-fill" id="storyFill"></div></div>
+    <div class="step rv" data-step><div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 7a4 4 0 1 0-4 4M11 11l-6 6v3h3l1-1h2v-2h2l1.5-1.5"/></svg></div>
+      <div><div class="n">Step one</div><h3>Tell us about your new apartment</h3><p>Your ZIP tells us your utility. Add home size, who's moving in, and how you live in it — or drop in your real usage from a past bill. The more you share, the sharper the estimate.</p></div></div>
+    <div class="step rv" data-step><div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c.7.7 1 1.4 1 2h6c0-.6.3-1.3 1-2a7 7 0 0 0-4-12z"/></svg></div>
+      <div><div class="n">Step two</div><h3>We price every plan at <em>your</em> usage</h3><p>Not a headline rate — the real all-in cost including your utility's delivery charges, the way an Electricity Facts Label is meant to be read. Filter by term, provider, and what matters to you.</p></div></div>
+    <div class="step rv" data-step><div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <div><div class="n">Step three</div><h3>Order in minutes — lights on by move-in</h3><p>Pick your plan and finish in about ten minutes. Same-day and no-deposit options, and most early-termination fees are waived if you move — ideal for a lease.</p></div></div>
+  </div>
+</div></section>
+
+<section id="tool" class="sec-petrol"><div class="wrap">
+  <div class="eyebrow-row rv"><span class="num">02</span><span class="kicker">Find your plan</span><span class="rule"></span></div>
+  <div style="max-width:62ch"><h2 class="big rv">A single “rate” never tells the truth. <em>Your usage does.</em></h2>
+    <p class="lead rv">Texas plans hide bill credits and fees that only trigger at certain usage levels. Give us a little context — we'll name your utility, estimate your usage transparently, and show the real winner across every term and provider.</p></div>
+
+  <div class="configure rv">
+    <div class="cfg-grid">
+      <div class="cfg"><label for="zip">New home ZIP</label><input id="zip" inputmode="numeric" maxlength="5" placeholder="75201"></div>
+      <div class="cfg"><label for="htype">Home type</label><select id="htype"><option>Apartment</option><option>Condo / Townhome</option><option>House</option></select></div>
+      <div class="cfg"><label for="size">Bedrooms</label><select id="size"><option value="600">Studio</option><option value="900" selected>1 bedroom</option><option value="1150">2 bedroom</option><option value="1500">3+ bedroom</option></select></div>
+      <div class="cfg"><label for="occ">People</label><select id="occ"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4+</option></select></div>
+      <div class="cfg"><label for="movein">Move-in date</label><input id="movein" type="date"></div>
+    </div>
+    <div class="util-bar" id="utilBar"><span class="chk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span><span>We found your utility: <b id="utilName">CenterPoint Energy</b> <span class="sub">— its delivery charges are already included in every price below. No markups.</span></span></div>
+    <div class="row2">
+      <div class="cell"><label>Home &amp; usage details</label>
+        <div class="msel" id="mDetails"><button type="button" class="msel-btn" data-m="mDetails"><span class="r">Add details</span><span style="display:flex;gap:8px;align-items:center"><span class="cnt" id="cntDetails">1</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></span></button><div class="msel-menu" id="menuDetails"></div></div>
+        <div class="pchips" id="chipDetails"></div></div>
+      <div class="cell"><label>Contract length</label>
+        <div class="msel" id="mTerm"><button type="button" class="msel-btn" data-m="mTerm"><span class="r" id="termLbl">Any length</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></button><div class="msel-menu" id="menuTerm"></div></div></div>
+      <div class="cell"><label>Providers</label>
+        <div class="msel" id="mProv"><button type="button" class="msel-btn" data-m="mProv"><span class="r" id="provLbl">All providers</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></button><div class="msel-menu" id="menuProv"></div></div></div>
+    </div>
+    <div class="knowrow"><span class="lbl">Have a past bill?</span>
+      <label class="tchip" id="knowChip"><input type="checkbox" id="know"><span class="bx"></span>I know my exact usage</label>
+      <span class="usebox">Actual kWh/mo <input type="number" id="actual" min="200" max="4000" step="50" value="1000" disabled></span>
+      <span style="font-size:12.5px;color:var(--faint-dk)">Most accurate — pulled straight from a prior bill.</span></div>
+    <div class="cfg-bottom">
+      <div class="estline"><span class="lbl">Estimated usage</span><b><span id="estKwh">950</span> kWh/mo</b><span class="bd" id="estBreak"></span></div>
+      <div class="priority"><span class="pl">Priorities</span><div class="seg" id="seg"><button class="on" data-p="price">Lowest price</button><button data-p="green">100% green</button><button data-p="nodep">No deposit</button><button data-p="simple">Simplest</button></div></div>
+    </div>
+    <div class="cfg-bottom" style="border-top:1px solid var(--line-lt)"><span style="font-size:13px;color:var(--faint-dk)">Free · no obligation · your info isn't sold</span><button class="btn go" onclick="run()">Reveal my plans →</button></div>
+    <span class="err" id="err">Please enter a valid 5-digit Texas ZIP code.</span>
+  </div>
+
+  <div id="results">
+    <div class="res-top">
+      <div class="readout"><div class="lab">Your best-fit plan · <span id="roU">950</span> kWh/mo</div>
+        <div class="cost">$<span id="roCost">0</span><small>/mo</small></div>
+        <div class="win"><span class="lg"><img id="roLogo" alt=""></span> <b id="roWin">—</b> · <span id="roAvg">—</span>¢/kWh all-in</div></div>
+      <div class="viz-note">Every line is a plan, priced at your usage including <span class="du" id="duNote">CenterPoint Energy</span> delivery. Hover to preview, click a line or row to inspect it below. Drag the slider to watch the winner change with usage.</div>
+    </div>
+
+    <div class="chart-card">
+      <div class="ct"><h3>Your most competitive plans, priced at your usage</h3><span>Illustrative · modeled to Electricity Facts Label logic</span></div>
+      <div class="legend" id="legend"></div>
+      <div class="chart-shell"><svg class="chart" id="chart" viewBox="0 0 1200 440"></svg><div class="tt" id="tt"></div></div>
+      <div class="slider-row"><span class="cap">500 kWh</span><input type="range" id="slider" min="500" max="2000" step="25" value="950" aria-label="Monthly usage in kilowatt-hours"><span class="cap">2,000 kWh</span></div>
+    </div>
+
+    <div class="detail" id="detail"></div>
+
+    <div class="rows-h"><span>Ranked for you — cheapest first at your estimated usage</span><span class="cnt" id="rowCnt"></span></div>
+    <div class="rows" id="rows"></div>
+
+    <div class="addons">
+      <div class="rv"><h3>Moving in today?</h3><p>Same-day and next-day connection on most plans — we rush the order so your lights are on when you arrive.</p></div>
+      <div class="rv"><h3>Renters insurance in 90 seconds</h3><p>Most leases require it. Add coverage powered by Lemonade right after you order.</p></div>
+      <div class="rv"><h3>Set up through your community</h3><p>Offered by Maple District Lofts as a move-in convenience. Free to you — providers pay ComparePower when you enroll.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<div class="sec-dark"><div class="wrap" style="padding-top:56px;padding-bottom:10px"><div class="kicker rv" style="text-align:center">Compare every major Texas provider — shop the plan, not the brand</div></div>
+  <div class="marq"><div class="marq-track" id="marq"></div></div>
+</div>
+
+<section class="sec-paper sources" style="padding-top:80px"><div class="wrap">
+  <div class="eyebrow-row rv"><span class="num">03</span><span class="kicker" style="color:var(--sky-ink)">Sources &amp; methodology</span><span class="rule"></span></div>
+  <p class="method rv"><b style="color:var(--ink)">How we estimate.</b> Your ZIP determines your regulated utility (TDU) — CenterPoint, Oncor, AEP Texas, or TNMP — whose delivery charges are included in every price shown<sup>[3]</sup>. Usage starts from typical Texas homes of your size (studio ≈ 600 · 1-bed ≈ 900 · 2-bed ≈ 1,150 · 3-bed+ ≈ 1,500 kWh), then adjusts for home type, people, and the usage drivers you select (A/C, electric heat, EV ≈ +300 kWh, pool ≈ +200, and more) — anchored to the ≈ 1,100 kWh/month statewide average<sup>[1]</sup>. Enter a real bill and we use that instead. Each plan's cost is modeled at that usage as all-in price — provider energy + base charges, minus usage credits, plus TDU delivery — the components a Texas Electricity Facts Label discloses at 500 / 1,000 / 2,000 kWh<sup>[2]</sup>.</p>
+  <div class="refgrid rv">
+    <div class="refl"><span class="n">1</span><div><b>U.S. Energy Information Administration</b> — TX residential price (≈ 15¢/kWh, 2025) &amp; average household use (≈ 1,100 kWh/mo). <a href="https://www.eia.gov/electricity/" target="_blank" rel="noopener">eia.gov</a></div></div>
+    <div class="refl"><span class="n">2</span><div><b>Public Utility Commission of Texas</b> — Electricity Facts Label rule (16 TAC §25.475): price at 500 / 1,000 / 2,000 kWh. <a href="https://www.puc.texas.gov/" target="_blank" rel="noopener">puc.texas.gov</a></div></div>
+    <div class="refl"><span class="n">3</span><div><b>ERCOT / Texas TDUs</b> — CenterPoint, Oncor, AEP Texas, TNMP delivery charges are regulated pass-throughs. <a href="https://www.ercot.com/" target="_blank" rel="noopener">ercot.com</a> · ComparePower TX Broker <b>BR190020</b>.</div></div>
+    <div class="refl"><span class="n">4</span><div><b>U.S. Dept. of Energy</b> — appliance/EV/HVAC energy-use guidance behind the usage adjustments. <a href="https://www.energy.gov/energysaver/estimating-appliance-and-home-electronic-energy-use" target="_blank" rel="noopener">energy.gov</a></div></div>
+  </div>
+  <p class="disc illus rv"><b>Illustrative concept only.</b> Unofficial demonstration, not affiliated with or endorsed by ComparePower. Plans, rates, providers, and document links are sample data modeled to Electricity Facts Label logic (July 2026). In production, live plans, prices, and the real EFL / Terms of Service / YRAC documents load from ComparePower's provider feed. Don't rely on these figures to enroll.</p>
+  <p class="disc rv"><b>Independent &amp; free.</b> ComparePower is an independent marketplace (Texas Broker BR190020) — not a utility, an electric provider, or a government program. <b>Estimates vary</b> with your actual usage, delivery charges, and current prices; savings aren't guaranteed. <b>Your community</b> may receive a referral fee when residents enroll but does not choose your plan or access your account. <b>Internal note:</b> partner referral structure (PUCT §25.112), paid-relationship disclosure (FTC), savings language (EFL + FTC), and resident-data handling (TDPSA) require ComparePower legal sign-off before any real launch.</p>
+</div></section>
+
+<footer><div class="wrap">
+  <div><img class="cp" src="https://comparepower.com/wp-content/themes/comparepower_v2_X/images/compare-power-logo-light.png" alt="ComparePower" onerror="this.style.display='none'"><div class="faddr">1920 McKinney Ave, 7th Floor, Dallas, TX 75201 · (469) 298-8045<br>TX Broker Registration BR190020 · The Power is Yours™</div></div>
+  <div class="fright">Unofficial concept &amp; prototype by Earl Lacey.<br>Not affiliated with ComparePower · illustrative demo, not a live ordering page.</div>
+</div></footer>
+
+<script>
+document.documentElement.className='js';
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const $=id=>document.getElementById(id);
+$('heroImg').style.backgroundImage="url('https://d8j0ntlcm91z4.cloudfront.net/user_3FpQhheKpn9fkge8Fyb2wKANTLJ/hf_20260701_192719_137ac41c-171a-4f9c-aef6-c90d2ac1e73f.png')";
+const LOGO=id=>`https://comparepower.com/media/providers/${id}.png`;
+
+/* ---- Texas TDUs by ZIP prefix (illustrative; production uses ESI-ID lookup) ---- */
+const TDUS={
+  centerpoint:{name:'CenterPoint Energy',base:4.90,per:0.051461},
+  oncor:{name:'Oncor Electric Delivery',base:4.23,per:0.044800},
+  aepc:{name:'AEP Texas Central',base:5.88,per:0.055900},
+  aepn:{name:'AEP Texas North',base:5.88,per:0.049200},
+  tnmp:{name:'Texas-New Mexico Power',base:7.85,per:0.061600},
+};
+function tduFor(zip){const p=zip.slice(0,3);
+  if(['770','771','772','773','774','775','776','777'].includes(p))return TDUS.centerpoint;
+  if(['783','784','785','780','781','782','788','789'].includes(p))return TDUS.aepc;
+  if(['795','796','797','798','799','793','794'].includes(p))return TDUS.aepn;
+  if(['764','765','779'].includes(p))return TDUS.tnmp;
+  return TDUS.oncor;}
+let TDU=TDUS.oncor;
+
+/* ---- plans (illustrative; real feed in production) ---- */
+const C=['#0a3242','#12a8dc','#137a49','#ff5f18','#0a6f95','#7a5cff','#e0407a','#f0a500','#00a58e','#5b6bd6','#c2533b','#2b7a9e'];
+const mk=(o,i)=>({...o,color:C[i%C.length],logo:LOGO(o.pid),
+  etfNote:o.etf?`$${o.etf} early-termination fee — typically waived if you end the contract because you're moving.`:'No early-termination fee — leave anytime.'});
+const PLANS=[
+ {prov:"TXU Energy",     plan:"Simply Fixed 12",    term:12, greenPct:0,  nodep:false,base:9.95,rate:0.099,credit:()=>0,                  etf:150,pid:78},
+ {prov:"Gexa Energy",    plan:"Eco Saver Plus 12",  term:12, greenPct:100,nodep:false,base:0,   rate:0.132,credit:k=>(k>=1000&&k<=2000)?100:0,etf:295,pid:77},
+ {prov:"Rhythm",         plan:"Simply Green 12",    term:12, greenPct:100,nodep:true, base:0,   rate:0.112,credit:()=>0,                  etf:149,pid:9998},
+ {prov:"Reliant",        plan:"Secure Advantage 24",term:24, greenPct:0,  nodep:false,base:4.95,rate:0.104,credit:()=>0,                  etf:295,pid:41},
+ {prov:"Pulse Power",    plan:"Texas Saver 12",     term:12, greenPct:0,  nodep:true, base:0,   rate:0.106,credit:k=>(k>=1000)?35:0,        etf:150,pid:81},
+ {prov:"Green Mountain", plan:"Pollution Free 24",  term:24, greenPct:100,nodep:false,base:4.95,rate:0.129,credit:()=>0,                  etf:295,pid:22},
+ {prov:"Frontier Utilities",plan:"Metro Saver 6",   term:6,  greenPct:0,  nodep:false,base:0,   rate:0.126,credit:k=>(k>=1000)?95:0,        etf:150,pid:63},
+ {prov:"Cirro Energy",   plan:"Smart Value 12",     term:12, greenPct:0,  nodep:false,base:0,   rate:0.119,credit:()=>0,                  etf:150,pid:72},
+ {prov:"Direct Energy",  plan:"Live Brighter 13",   term:13, greenPct:0,  nodep:false,base:0,   rate:0.124,credit:k=>(k>=1000&&k<=2000)?100:0,etf:150,pid:14},
+ {prov:"Constellation",  plan:"36 Month Fixed",     term:36, greenPct:0,  nodep:false,base:4.99,rate:0.111,credit:()=>0,                  etf:150,pid:74},
+ {prov:"Champion Energy",plan:"Champ Saver 12",     term:12, greenPct:0,  nodep:false,base:0,   rate:0.121,credit:k=>(k>=1000)?75:0,        etf:150,pid:10},
+ {prov:"Payless Power",  plan:"Month-to-Month",     term:1,  greenPct:0,  nodep:true, base:0,   rate:0.149,credit:()=>0,                  etf:0,  pid:80},
+].map(mk);
+const cost=(p,k)=>p.base+p.rate*k+(TDU.base+TDU.per*k)-p.credit(k);
+const allin=(p,k)=>cost(p,k)/k*100;
+let usage=950,priority='price',selected=0;
+const clampU=u=>Math.max(500,Math.min(2000,u));
+
+/* usage drivers */
+const DETAILS=[
+ {id:'ac',label:'Central A/C',est:'+15%',mult:1.15},
+ {id:'eheat',label:'Electric heat / heat pump',est:'+18%',mult:1.18},
+ {id:'ewh',label:'Electric water heater',est:'+10%',mult:1.10},
+ {id:'ev',label:'EV charging at home',est:'+300 kWh',add:300},
+ {id:'pool',label:'Pool or hot tub',est:'+200 kWh',add:200},
+ {id:'wfh',label:'Work from home',est:'+8%',mult:1.08},
+ {id:'allel',label:'All-electric appliances',est:'+12%',mult:1.12},
+ {id:'gaming',label:'Gaming / multiple PCs',est:'+6%',mult:1.06},
+ {id:'old',label:'Older / less-insulated building',est:'+10%',mult:1.10},
+ {id:'smart',label:'Smart / efficient thermostat',est:'−6%',mult:0.94},
+];
+const selD=new Set(['ac']);
+/* filters */
+const selTerm=new Set(), selProv=new Set();
+
+function passesFilters(p){return (selTerm.size===0||selTerm.has(p.term))&&(selProv.size===0||selProv.has(p.prov));}
+function ranked(k){let l=PLANS.filter(passesFilters).map((p)=>({...p,_i:PLANS.indexOf(p),c:cost(p,k)}));l.sort((a,b)=>a.c-b.c);
+ if(priority==='green') l.sort((a,b)=>((b.greenPct>=100)-(a.greenPct>=100))||(a.c-b.c));
+ if(priority==='nodep') l.sort((a,b)=>(b.nodep-a.nodep)||(a.c-b.c));
+ if(priority==='simple')l.sort((a,b)=>((a.credit(k)?1:0)-(b.credit(k)?1:0))||(a.c-b.c));
+ return l;}
+const winnerIdx=k=>{const r=ranked(k);return r.length?r[0]._i:0;};
+const chartSet=k=>ranked(k).slice(0,7);
+
+/* estimator */
+function estimate(){
+  if($('know').checked)return clampU(+$('actual').value||1000);
+  const base=+$('size').value,tm={'Apartment':1,'Condo / Townhome':1.05,'House':1.25}[$('htype').value],om={'1':.9,'2':1,'3':1.12,'4':1.25}[$('occ').value];
+  let e=base*tm*om,add=0;DETAILS.forEach(d=>{if(selD.has(d.id)){if(d.mult)e*=d.mult;if(d.add)add+=d.add;}});
+  return clampU(Math.round((e+add)/25)*25);
+}
+function estBreak(){
+  if($('know').checked)return 'From your past bill';
+  const bed={600:'studio',900:'1-bed',1150:'2-bed',1500:'3-bed'}[+$('size').value];
+  const ppl=$('occ').value==='4'?'4+ people':($('occ').value==='1'?'1 person':$('occ').value+' people');
+  let parts=[`${bed} ${$('htype').value.toLowerCase().replace(' / townhome','')}`,ppl];
+  DETAILS.forEach(d=>{if(selD.has(d.id))parts.push(d.label.toLowerCase());});
+  return 'Based on: '+parts.join(' · ');
+}
+function refreshEstimate(){usage=estimate();$('estKwh').textContent=usage.toLocaleString();$('estBreak').textContent=estBreak();}
+
+/* utility detection */
+$('zip').addEventListener('input',()=>{const z=$('zip').value.trim();
+  if(/^\d{5}$/.test(z)&&z.startsWith('7')){TDU=tduFor(z);$('utilName').textContent=TDU.name;$('utilBar').classList.add('show');}
+  else $('utilBar').classList.remove('show');});
+
+/* multiselect: details */
+function buildDetails(){$('menuDetails').innerHTML=DETAILS.map(d=>`<label class="opt"><input type="checkbox" data-d="${d.id}" ${selD.has(d.id)?'checked':''}> ${d.label}<span class="est">${d.est}</span></label>`).join('');}
+function chipDetails(){$('cntDetails').textContent=selD.size;$('chipDetails').innerHTML=[...selD].map(id=>{const d=DETAILS.find(x=>x.id===id);return `<span class="pchip">${d.label}<i data-r="${id}">×</i></span>`;}).join('');}
+buildDetails();chipDetails();
+$('menuDetails').addEventListener('change',e=>{const id=e.target.dataset.d;if(!id)return;e.target.checked?selD.add(id):selD.delete(id);chipDetails();refreshEstimate();});
+$('chipDetails').addEventListener('click',e=>{if(e.target.dataset.r){selD.delete(e.target.dataset.r);buildDetails();chipDetails();refreshEstimate();}});
+
+/* multiselect: term + provider */
+const TERMS=[...new Set(PLANS.map(p=>p.term))].sort((a,b)=>a-b);
+const termLabel=t=>t===1?'Month-to-month':`${t} months`;
+function buildTerm(){$('menuTerm').innerHTML=TERMS.map(t=>`<label class="opt"><input type="checkbox" data-t="${t}" ${selTerm.has(t)?'checked':''}> ${termLabel(t)}</label>`).join('');}
+function termLbl(){$('termLbl').textContent=selTerm.size?[...selTerm].sort((a,b)=>a-b).map(termLabel).join(', '):'Any length';}
+buildTerm();termLbl();
+$('menuTerm').addEventListener('change',e=>{const t=+e.target.dataset.t;e.target.checked?selTerm.add(t):selTerm.delete(t);termLbl();refreshResults();});
+const PROVS=[...new Set(PLANS.map(p=>p.prov))];
+function buildProv(){$('menuProv').innerHTML=PROVS.map(pv=>`<label class="opt"><input type="checkbox" data-pv="${pv}" ${selProv.has(pv)?'checked':''}> ${pv}</label>`).join('');}
+function provLbl(){$('provLbl').textContent=selProv.size?`${selProv.size} selected`:'All providers';}
+buildProv();provLbl();
+$('menuProv').addEventListener('change',e=>{const pv=e.target.dataset.pv;e.target.checked?selProv.add(pv):selProv.delete(pv);provLbl();refreshResults();});
+
+/* dropdown open/close */
+document.querySelectorAll('.msel-btn').forEach(b=>b.addEventListener('click',()=>{const m=b.closest('.msel');const open=m.classList.contains('open');document.querySelectorAll('.msel').forEach(x=>x.classList.remove('open'));if(!open)m.classList.add('open');}));
+document.addEventListener('click',e=>{if(!e.target.closest('.msel'))document.querySelectorAll('.msel').forEach(x=>x.classList.remove('open'));});
+
+['size','htype','occ'].forEach(id=>$(id).addEventListener('change',refreshEstimate));
+$('know').addEventListener('change',()=>{$('actual').disabled=!$('know').checked;$('knowChip').classList.toggle('on',$('know').checked);refreshEstimate();});
+$('actual').addEventListener('input',refreshEstimate);
+
+function tickN(el,to,dur=650){const from=+(el.dataset.v||0),t0=performance.now();
+  if(RM){el.textContent=Math.round(to).toLocaleString();el.dataset.v=to;return;}
+  (function s(t){let p=Math.min(1,(t-t0)/dur);p=1-Math.pow(1-p,3);el.textContent=Math.round(from+(to-from)*p).toLocaleString();if(p<1)requestAnimationFrame(s);else el.dataset.v=to;})(t0);}
+
+$('seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...$('seg').children].forEach(x=>x.classList.remove('on'));b.classList.add('on');priority=b.dataset.p;refreshResults();});
+function goTool(){$('tool').scrollIntoView({behavior:RM?'auto':'smooth'});}
+function refreshResults(){if($('results').style.display!=='block')return;selected=winnerIdx(usage);drawChart();renderRows();updateDisplay();}
+
+function run(){
+  const zip=$('zip').value.trim();
+  if(!/^\d{5}$/.test(zip)||!zip.startsWith('7')){$('err').style.display='block';return;}
+  $('err').style.display='none';TDU=tduFor(zip);$('duNote').textContent=TDU.name;refreshEstimate();
+  $('slider').value=usage;$('results').style.display='block';selected=winnerIdx(usage);
+  drawChart();renderRows();updateDisplay();observe();
+  setTimeout(()=>$('results').scrollIntoView({behavior:RM?'auto':'smooth',block:'start'}),50);
+}
+
+/* ===== chart ===== */
+const V={w:1200,h:440,l:64,r:26,t:26,b:44,uMin:500,uMax:2000};
+const xOf=u=>V.l+(u-V.uMin)/(V.uMax-V.uMin)*(V.w-V.l-V.r);
+let YB=[0,1];
+function bounds(set){let lo=1e9,hi=-1e9;set.forEach(p=>{for(let u=V.uMin;u<=V.uMax;u+=25){const c=cost(p,u);lo=Math.min(lo,c);hi=Math.max(hi,c);}});if(lo>hi){lo=0;hi=300;}return[Math.floor(lo/20)*20-14,Math.ceil(hi/20)*20+18];}
+const yOf=c=>V.t+(1-(c-YB[0])/(YB[1]-YB[0]))*(V.h-V.t-V.b);
+const linePath=p=>{let d='';for(let u=V.uMin;u<=V.uMax;u+=20)d+=(u===V.uMin?'M':'L')+xOf(u).toFixed(1)+','+yOf(cost(p,u)).toFixed(1);return d;};
+const areaPath=p=>{let d=`M${xOf(V.uMin).toFixed(1)},${V.h-V.b}`;for(let u=V.uMin;u<=V.uMax;u+=20)d+='L'+xOf(u).toFixed(1)+','+yOf(cost(p,u)).toFixed(1);return d+`L${xOf(V.uMax).toFixed(1)},${V.h-V.b}Z`;};
+let CS=[];
+function drawChart(){
+  CS=chartSet(usage);YB=bounds(CS);const svg=$('chart');
+  let g='';for(let i=0;i<=3;i++){const c=YB[0]+(YB[1]-YB[0])*i/3,y=yOf(c).toFixed(1);
+    g+=`<line x1="${V.l}" y1="${y}" x2="${V.w-V.r}" y2="${y}" stroke="#e6eef0"/><text x="${V.l-10}" y="${(+y+4)}" text-anchor="end" font-size="13" fill="#7f9aa4" font-family="Inter">$${Math.round(c)}</text>`;}
+  [500,1000,1500,2000].forEach(u=>{g+=`<text x="${xOf(u).toFixed(1)}" y="${V.h-14}" text-anchor="middle" font-size="13" fill="#7f9aa4" font-family="Inter">${u.toLocaleString()} kWh</text>`;});
+  let lines='',hits='',dots='';
+  CS.forEach(p=>{const d=linePath(p);
+    lines+=`<path class="pl" data-i="${p._i}" d="${d}" fill="none" stroke="${p.color}" stroke-width="2.4" stroke-linecap="round" opacity=".9"/>`;
+    hits+=`<path class="hit" data-i="${p._i}" d="${d}" fill="none" stroke="transparent" stroke-width="18" style="cursor:pointer"/>`;
+    dots+=`<circle class="dot" data-i="${p._i}" r="4.5" fill="#fff" stroke="${p.color}" stroke-width="2.5"/>`;});
+  svg.innerHTML=`<defs><linearGradient id="selfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#37c6ef" stop-opacity=".24"/><stop offset="1" stop-color="#37c6ef" stop-opacity="0"/></linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    ${g}<path id="selArea" d="" fill="url(#selfill)" opacity="0"/>
+    <line id="mk" x1="0" y1="${V.t}" x2="0" y2="${V.h-V.b}" stroke="#0a6f95" stroke-width="1.5" stroke-dasharray="4 5"/>
+    ${lines}${dots}<circle id="knob" cy="${V.t}" r="9" fill="#fff" stroke="#0a6f95" stroke-width="3" style="cursor:ew-resize"/>${hits}`;
+  if(!RM)svg.querySelectorAll('.pl').forEach((path,i)=>{const L=path.getTotalLength();path.style.strokeDasharray=L;path.style.strokeDashoffset=L;path.getBoundingClientRect();path.style.transition=`stroke-dashoffset 1s ${.05*i}s var(--ease)`;path.style.strokeDashoffset=0;});
+  $('legend').innerHTML=CS.map(p=>`<button class="lc" data-i="${p._i}"><span class="sw" style="background:${p.color}"></span>${p.prov}</button>`).join('');
+  $('legend').querySelectorAll('.lc').forEach(b=>b.addEventListener('click',()=>pick(+b.dataset.i)));
+  const tt=$('tt');
+  svg.querySelectorAll('.hit').forEach(h=>{const i=+h.dataset.i;
+    h.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect();tt.style.left=(e.clientX-r.left)+'px';tt.style.top=(yOf(cost(PLANS[i],usage))/V.h*r.height)+'px';tt.innerHTML=`${PLANS[i].prov} <span class="s">$${Math.round(cost(PLANS[i],usage))}/mo</span>`;tt.style.opacity=1;emphasize(i);});
+    h.addEventListener('pointerleave',()=>{tt.style.opacity=0;emphasize(selected);});
+    h.addEventListener('click',()=>pick(i));});
+  let drag=false;const toU=cx=>{const r=svg.getBoundingClientRect();const sx=(cx-r.left)/r.width*V.w;let u=V.uMin+(sx-V.l)/(V.w-V.l-V.r)*(V.uMax-V.uMin);return clampU(Math.round(u/25)*25);};
+  $('knob').addEventListener('pointerdown',()=>drag=true);
+  addEventListener('pointermove',e=>{if(drag){usage=toU(e.clientX);updateDisplay();}});
+  addEventListener('pointerup',()=>{if(drag){drag=false;renderRows();}});
+}
+function emphasize(i){document.querySelectorAll('#chart .pl').forEach(p=>{const on=+p.dataset.i===i;p.setAttribute('stroke-width',on?'3.8':'1.8');p.setAttribute('opacity',on?'1':'.4');p.setAttribute('filter',on?'url(#glow)':'');});
+  document.querySelectorAll('#legend .lc').forEach(l=>l.classList.toggle('on',+l.dataset.i===i));
+  const sa=$('selArea');if(sa&&CS.some(p=>p._i===i)){sa.setAttribute('d',areaPath(PLANS[i]));sa.style.transition='opacity .5s';sa.style.opacity=1;}else if(sa){sa.style.opacity=0;}}
+function pick(i){selected=i;emphasize(i);renderDetail();markRows();}
+
+$('slider').addEventListener('input',e=>{usage=+e.target.value;updateDisplay();});
+$('slider').addEventListener('change',e=>{usage=+e.target.value;drawChart();renderRows();updateDisplay();});
+
+function updateDisplay(){
+  const wi=winnerIdx(usage),b=PLANS[wi],x=xOf(usage);
+  $('mk').setAttribute('x1',x);$('mk').setAttribute('x2',x);$('knob').setAttribute('cx',x);
+  document.querySelectorAll('#chart .dot').forEach(d=>{const i=+d.dataset.i;d.setAttribute('cx',x);d.setAttribute('cy',yOf(cost(PLANS[i],usage)));d.setAttribute('r',i===wi?6.5:4.5);});
+  const sl=$('slider');sl.value=usage;sl.style.setProperty('--pct',((usage-500)/1500*100)+'%');
+  $('roU').textContent=usage.toLocaleString();tickN($('roCost'),Math.round(cost(b,usage)));
+  $('roWin').textContent=b.prov;$('roAvg').textContent=allin(b,usage).toFixed(1);$('roLogo').src=b.logo;$('roLogo').alt=b.prov;
+  emphasize(selected);renderDetail();
+}
+
+function whyLine(p,i){const wi=winnerIdx(usage);
+  if(i===wi)return `Your lowest all-in cost at ${usage.toLocaleString()} kWh — nothing here beats it for your usage.`;
+  const diff=Math.round(cost(p,usage)-cost(PLANS[wi],usage));
+  if(p.credit(usage)>0)return `A $${p.credit(usage)} monthly usage credit makes this strong at higher usage — right now about $${diff}/mo over the best pick.`;
+  if(p.greenPct>=100)return `100% renewable energy — about $${diff}/mo more than the cheapest option at your usage.`;
+  if(p.term===1)return `Month-to-month freedom, no contract — about $${diff}/mo more for the flexibility.`;
+  return `Simple ${p.term}-month fixed rate — about $${diff}/mo more than ${PLANS[wi].prov} at your usage.`;}
+function docIcon(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';}
+function renderDetail(){
+  const p=PLANS[selected],k=usage,pts=[500,1000,2000].map(u=>allin(p,u)),h=v=>Math.max(10,Math.min(100,(v-8)/(20-8)*100));
+  const energy=p.rate*k,cr=p.credit(k),tdud=TDU.per*k,provSub=p.base+energy-cr,tduSub=TDU.base+tdud,total=provSub+tduSub;
+  $('detail').innerHTML=`
+    <div class="dcol">
+      <div class="dh"><span class="dlogo"><img src="${p.logo}" alt="${p.prov}" onerror="this.parentNode.innerHTML='<b style=&quot;color:#0a3242;font-size:14px&quot;>${p.prov}</b>'"></span>
+        <span class="dp">${p.prov}<small>${p.plan} · ${p.term===1?'month-to-month':p.term+'-month'} · fixed rate</small></span></div>
+      <div class="dtags">${selected===winnerIdx(k)?'<span class="tag best">Best for you</span>':''}${p.greenPct>=100?'<span class="tag green">100% green</span>':''}${p.nodep?'<span class="tag nd">No deposit</span>':''}${p.credit(k)>0?`<span class="tag fit">$${p.credit(k)} credit</span>`:'<span class="tag fit">Fixed rate</span>'}</div>
+      <div class="docs"><a href="#" onclick="return docAlert('Electricity Facts Label')">${docIcon()} Facts Label</a><a href="#" onclick="return docAlert('Terms of Service')">${docIcon()} Terms of Service</a><a href="#" onclick="return docAlert('YRAC')">${docIcon()} YRAC</a></div>
+      <div class="etf"><b>Early termination:</b> ${p.etfNote}</div>
+      <button class="btn dsel" onclick="checkoutAlert('${p.prov}')">Select ${p.prov} →</button>
+    </div>
+    <div class="dcol">
+      <div style="font-size:11.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--sky-ink);font-weight:700;margin-bottom:12px">At your usage</div>
+      <div class="dbig"><span class="m">${allin(p,k).toFixed(1)}¢</span><span class="u">per kWh, all-in</span></div>
+      <div class="dsub">≈ $${Math.round(cost(p,k)).toLocaleString()}/mo at ${k.toLocaleString()} kWh</div>
+      <div class="calc"><div class="ch">How your bill is built · ${k.toLocaleString()} kWh</div>
+        <table>
+          <tr><td>Energy charge (${(p.rate*100).toFixed(1)}¢ × ${k.toLocaleString()})</td><td>$${energy.toFixed(2)}</td></tr>
+          ${p.base?`<tr><td>Base charge</td><td>$${p.base.toFixed(2)}</td></tr>`:''}
+          ${cr?`<tr class="cr"><td>Usage credit</td><td>−$${cr.toFixed(2)}</td></tr>`:''}
+          <tr class="sub"><td>${p.prov} subtotal</td><td>$${provSub.toFixed(2)}</td></tr>
+          <tr><td>${TDU.name} base</td><td>$${TDU.base.toFixed(2)}</td></tr>
+          <tr><td>${TDU.name} delivery (${(TDU.per*100).toFixed(2)}¢ × ${k.toLocaleString()})</td><td>$${tdud.toFixed(2)}</td></tr>
+          <tr class="sub"><td>Delivery subtotal</td><td>$${tduSub.toFixed(2)}</td></tr>
+          <tr class="tot"><td>Estimated total</td><td>$${total.toFixed(2)}</td></tr>
+        </table></div>
+    </div>
+    <div class="dcol efl"><div class="et"><span style="color:var(--sky-ink)">Facts Label preview</span><span>all-in ¢/kWh at 3 usage points</span></div>
+      <div class="bars">${[500,1000,2000].map((u,j)=>`<div class="b"><div class="bar"><i style="height:${h(pts[j])}%"></i></div><div class="v">${pts[j].toFixed(1)}<small>¢</small></div><div class="k">${u.toLocaleString()} kWh</div></div>`).join('')}</div>
+      <div class="foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg><span>No hidden fees — every price already includes energy, discounts, and ${TDU.name} delivery charges.</span></div>
+    </div>`;
+}
+function docAlert(t){alert('In production this opens the official '+t+' document from the provider.');return false;}
+function checkoutAlert(pv){alert('In production this opens ComparePower secure checkout for '+pv+', pre-tagged as referred by Maple District Lofts (PMC-MDL-0417). Same-day / no-deposit carry through.');}
+
+function renderRows(){
+  const k=usage,list=ranked(k);
+  $('rowCnt').textContent=`Showing ${list.length} of ${PLANS.length} plans`;
+  $('rows').innerHTML=list.length?list.map((p,i)=>{const a=allin(p,k).toFixed(1);
+    return `<div class="row ${i===0?'best':''} ${p._i===selected?'sel':''}" data-i="${p._i}" onclick="pick(${p._i})">
+      <div class="rank">${String(i+1).padStart(2,'0')}</div>
+      <div class="logo"><img src="${p.logo}" alt="${p.prov}" onerror="this.parentNode.innerHTML='<b style=&quot;color:#0a3242;font-size:13px&quot;>${p.prov}</b>'"></div>
+      <div class="info"><div class="pn">${p.prov}</div><div class="meta">${p.plan} · ${p.term===1?'month-to-month':p.term+'-month'}${p.credit(k)>0?` · $${p.credit(k)} usage credit`:''}</div>
+        <div class="tags">${i===0?`<span class="tag best">${priority==='price'?'Best value':'Best for “'+segLabel()+'”'}</span>`:''}<span class="tag fit">${a}¢/kWh</span>${p.greenPct>=100?'<span class="tag green">Green</span>':''}${p.nodep?'<span class="tag nd">No deposit</span>':''}</div></div>
+      <div class="price"><div class="m">$<span class="cu" data-to="${Math.round(p.c)}">0</span><small>/mo</small></div><div class="a">at ${k.toLocaleString()} kWh</div>
+        <button class="btn sel" onclick="event.stopPropagation();checkoutAlert('${p.prov}')">Select</button></div>
+    </div>`;}).join(''):'<div style="background:#fff;border:1px solid var(--line-lt);border-radius:14px;padding:26px;text-align:center;color:var(--ink-2)">No plans match those filters — try clearing a contract-length or provider filter.</div>';
+  $('rows').querySelectorAll('.cu').forEach(s=>tickN(s,+s.dataset.to,700));
+}
+function markRows(){document.querySelectorAll('#rows .row').forEach(r=>r.classList.toggle('sel',+r.dataset.i===selected));}
+function segLabel(){return {price:'lowest price',green:'100% green',nodep:'no deposit',simple:'simplest'}[priority];}
+
+(function(){const ids=[78,41,77,9998,81,22,63,72,14,74,10,80,1,53];const set=ids.map(id=>`<img src="${LOGO(id)}" alt="" onerror="this.style.display='none'">`).join('');$('marq').innerHTML=set+set;})();
+
+const steps=[...document.querySelectorAll('#steps [data-step]')];
+function storyScroll(){const t=document.querySelector('.story-track');if(!t)return;const r=t.getBoundingClientRect(),vh=innerHeight,prog=Math.max(0,Math.min(1,(vh*.6-r.top)/r.height));$('storyFill').style.height=(prog*100)+'%';steps.forEach(s=>s.classList.toggle('on',s.getBoundingClientRect().top<vh*.7));}
+let io;function observe(){if(!io)io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.14});document.querySelectorAll('.rv').forEach(el=>io.observe(el));}
+observe();addEventListener('scroll',()=>{$('nav').classList.toggle('solid',scrollY>50);storyScroll();},{passive:true});storyScroll();
+
+if(!RM){const cv=$('spark'),cx=cv.getContext('2d');let W,H,ps;
+  function rs(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight;ps=Array.from({length:Math.min(60,Math.floor(W/26))},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.3,s:Math.random()*.3+.05,a:Math.random()*.5+.12}));}
+  rs();addEventListener('resize',rs);(function loop(){cx.clearRect(0,0,W,H);for(const p of ps){p.y-=p.s;if(p.y<-6){p.y=H+6;p.x=Math.random()*W;}cx.beginPath();cx.arc(p.x,p.y,p.r,0,6.283);cx.fillStyle=`rgba(120,220,250,${p.a})`;cx.fill();}requestAnimationFrame(loop);})();}
+
+$('movein').value=new Date().toISOString().slice(0,10);
+$('zip').addEventListener('keydown',e=>{if(e.key==='Enter')run();});
+refreshEstimate();
+</script>
+</body>
+</html>
