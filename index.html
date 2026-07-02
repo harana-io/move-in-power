@@ -103,6 +103,8 @@
   .util-bar.show{display:flex}
   .util-bar .chk{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .util-bar b{color:var(--petrol)} .util-bar span.sub{color:var(--ink-2);font-weight:500}
+  .util-bar #cityWrap{color:var(--green-dk)} .util-bar .citytag{color:var(--petrol);font-weight:700} .util-bar .pin{vertical-align:-2px;color:var(--sky-ink)}
+  .util-bar select{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--petrol);border:1.5px solid #bfe3d0;background:#fff;border-radius:8px;padding:4px 8px;margin:0 4px;cursor:pointer}
   .row2{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--line-lt)}
   @media(max-width:820px){.row2{grid-template-columns:1fr}}
   .cell{padding:22px 24px;border-right:1px solid var(--line-lt);position:relative}.cell:last-child{border-right:none}
@@ -283,7 +285,7 @@
       <div class="cfg"><label for="occ">People</label><select id="occ"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4+</option></select></div>
       <div class="cfg"><label for="movein">Move-in date</label><input id="movein" type="date"></div>
     </div>
-    <div class="util-bar" id="utilBar"><span class="chk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span><span>We found your utility: <b id="utilName">CenterPoint Energy</b> <span class="sub">— its delivery charges are already included in every price below. No markups.</span></span></div>
+    <div class="util-bar" id="utilBar"><span class="chk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span><span>We found your utility: <b id="utilName">CenterPoint Energy</b><span id="cityWrap"></span> <span class="sub">— delivery charges already included in every price below. No markups.</span></span></div>
     <div class="row2">
       <div class="cell"><label>Home &amp; usage details</label>
         <div class="msel" id="mDetails"><button type="button" class="msel-btn" data-m="mDetails"><span class="r">Add details</span><span style="display:flex;gap:8px;align-items:center"><span class="cnt" id="cntDetails">1</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></span></button><div class="msel-menu" id="menuDetails"></div></div>
@@ -364,12 +366,30 @@ const LOGO=id=>`https://comparepower.com/media/providers/${id}.png`;
 
 /* ---- Texas TDUs by ZIP prefix (illustrative; production uses ESI-ID lookup) ---- */
 const TDUS={
-  centerpoint:{name:'CenterPoint Energy',base:4.90,per:0.051461},
-  oncor:{name:'Oncor Electric Delivery',base:4.23,per:0.044800},
-  aepc:{name:'AEP Texas Central',base:5.88,per:0.055900},
-  aepn:{name:'AEP Texas North',base:5.88,per:0.049200},
-  tnmp:{name:'Texas-New Mexico Power',base:7.85,per:0.061600},
+  centerpoint:{name:'CenterPoint Energy',base:4.90,per:0.051461,region:'Greater Houston'},
+  oncor:{name:'Oncor Electric Delivery',base:4.23,per:0.044800,region:'North Texas / DFW'},
+  aepc:{name:'AEP Texas Central',base:5.88,per:0.055900,region:'South Texas'},
+  aepn:{name:'AEP Texas North',base:5.88,per:0.049200,region:'West Texas'},
+  tnmp:{name:'Texas-New Mexico Power',base:7.85,per:0.061600,region:'Texas'},
 };
+/* ZIP -> city/cities (illustrative; production uses a full USPS/ESI lookup) */
+const ZIP_CITIES={
+ "77586":["Seabrook","Taylor Lake Village","El Lago"],"77565":["Kemah","Clear Lake Shores"],
+ "77573":["League City","Dickinson"],"77598":["Webster"],"77546":["Friendswood"],"77062":["Houston (Clear Lake)"],
+ "77002":["Houston"],"77006":["Houston"],"77007":["Houston"],"77036":["Houston"],
+ "77494":["Katy","Fulshear"],"77384":["Conroe","The Woodlands"],"77304":["Conroe"],
+ "75201":["Dallas"],"75204":["Dallas"],"75024":["Plano"],"75080":["Richardson"],"75039":["Irving"],
+ "76102":["Fort Worth"],"76248":["Keller"],"76015":["Arlington"],"78401":["Corpus Christi"],
+};
+const PIN='<svg class="pin" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.6"/></svg>';
+let selectedCity=null;
+function renderCity(zip){const wrap=$('cityWrap');if(!wrap)return;const cities=ZIP_CITIES[zip];
+ if(cities&&cities.length===1){selectedCity=cities[0];wrap.innerHTML=` · ${PIN} <span class="citytag">${cities[0]}, TX</span>`;}
+ else if(cities&&cities.length>1){selectedCity=cities[0];
+  wrap.innerHTML=` · ${PIN} Which area? <select id="citySel">${cities.map(c=>`<option>${c}</option>`).join('')}</select> TX`;
+  $('citySel').addEventListener('change',e=>{selectedCity=e.target.value;});}
+ else{selectedCity=null;wrap.innerHTML=` · <span style="color:var(--ink-2)">${TDU.region} area</span>`;}
+}
 function tduFor(zip){const p=zip.slice(0,3);
   if(['770','771','772','773','774','775','776','777'].includes(p))return TDUS.centerpoint;
   if(['783','784','785','780','781','782','788','789'].includes(p))return TDUS.aepc;
@@ -446,8 +466,8 @@ function refreshEstimate(){usage=estimate();$('estKwh').textContent=usage.toLoca
 
 /* utility detection */
 $('zip').addEventListener('input',()=>{const z=$('zip').value.trim();
-  if(/^\d{5}$/.test(z)&&z.startsWith('7')){TDU=tduFor(z);$('utilName').textContent=TDU.name;$('utilBar').classList.add('show');}
-  else $('utilBar').classList.remove('show');});
+  if(/^\d{5}$/.test(z)&&z.startsWith('7')){TDU=tduFor(z);$('utilName').textContent=TDU.name;renderCity(z);$('utilBar').classList.add('show');}
+  else{$('utilBar').classList.remove('show');selectedCity=null;}});
 
 /* multiselect: details */
 function buildDetails(){$('menuDetails').innerHTML=DETAILS.map(d=>`<label class="opt"><input type="checkbox" data-d="${d.id}" ${selD.has(d.id)?'checked':''}> ${d.label}<span class="est">${d.est}</span></label>`).join('');}
